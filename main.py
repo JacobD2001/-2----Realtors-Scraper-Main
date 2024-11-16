@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from flask import Flask, jsonify
 import os
 import requests
 from typing import List, Dict
@@ -12,7 +12,7 @@ TABLE_ID = os.getenv('NOCODB_TABLE_ID')
 
 APIFY_DATASET_URL = "https://api.apify.com/v2/acts/jupri~realtor-agents/runs/last/dataset/items"
 
-app = FastAPI()
+app = Flask(__name__)
 
 def fetch_apify_data() -> List[Dict]:
     """Fetch data from Apify API"""
@@ -33,8 +33,8 @@ def save_to_nocodb(data: List[Dict]) -> bool:
     
     return response.status_code == 200
 
-@app.post("/run-app")
-async def run_app():
+@app.route("/run-app", methods=['POST'])
+def run_app():
     try:
         # Fetch data from Apify
         apify_data = fetch_apify_data()
@@ -43,10 +43,13 @@ async def run_app():
         success = save_to_nocodb(apify_data)
         
         if success:
-            return {"status": "Data saved successfully"}
+            return jsonify({"status": "Data saved successfully"})
         else:
-            return {"status": "Failed to save data"}
+            return jsonify({"status": "Failed to save data"}), 500
             
     except Exception as e:
-        return {"status": "Error", "message": str(e)}
+        return jsonify({"status": "Error", "message": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
 
