@@ -17,7 +17,7 @@ COPY . .
 EXPOSE 8000
 
 # Set environment variable for inside container
-ENV PORT=8000
+# ENV PORT=8000
 
 # Command to run the application
-CMD ["python", "main.py"]
+CMD gunicorn -b 0.0.0.0:$PORT main:app

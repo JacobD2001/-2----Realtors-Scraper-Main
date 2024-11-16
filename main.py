@@ -61,6 +61,12 @@ def save_to_nocodb(data: List[Dict]) -> bool:
         logger.error(f"Error saving to NocoDB: {str(e)}")
         return False
 
+# ...existing code...
+@app.route("/", methods=['GET'])
+def home():
+    return jsonify({"status": "API is running"})
+# ...existing code...
+
 @app.route("/run-app", methods=['POST'])
 def run_app():
     logger.info("Starting data processing pipeline")
@@ -86,4 +92,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8000))
     logger.info(f"Starting Flask application on port {port}")
     app.run(host='0.0.0.0', port=port)
+
 
